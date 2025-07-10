@@ -2,20 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ESP32C3 Flasher</title>
-  <script src="https://unpkg.com/espwebtool@5.3.0/dist/espwebtool.js"></script>
+  <title>ESP32-C3 Super Mini Flasher</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 50px; }
+    .flasher-actions { display: flex; gap: 24px; margin-bottom: 32px; }
+    button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    #flash-btn { background: #4caf50; color: #fff; }
+    #status { margin-top: 16px; color: #1976d2; }
+  </style>
+  <!-- espwebtool v3.2.0 -->
+  <script src="https://unpkg.com/espwebtool@3.2.0/dist/espwebtool.js"></script>
 </head>
 <body>
-  <button id="flash-btn">Flash Firmware</button>
+  <h2>ESP32-C3 Super Mini Flasher</h2>
+  <div class="flasher-actions">
+    <button id="flash-btn">Flash Firmware</button>
+    <span id="status"></span>
+  </div>
   <script>
-    window.onload = function() {
-      document.getElementById('flash-btn').onclick = function() {
-        if (window.espWebTool && window.espWebTool.open) {
-          window.espWebTool.open({ manifest: 'firmware/manifest.json' });
-        } else {
-          alert('espWebTool chưa sẵn sàng!');
-        }
-      };
+    document.getElementById('flash-btn').onclick = function() {
+      // Mở giao diện flash, đọc manifest, KHÔNG kiểm tra Improv Wi-Fi
+      if (window.espWebTool && window.espWebTool.open) {
+        window.espWebTool.open({ manifest: 'firmware/manifest.json' });
+      } else {
+        alert('espWebTool chưa sẵn sàng!');
+      }
     };
   </script>
 </body>
