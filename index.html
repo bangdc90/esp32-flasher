@@ -2,46 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dasai Mochi ESP32-C3 Flasher</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 50px; }
-    .flasher-actions { display: flex; gap: 24px; margin-bottom: 32px; }
-    button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-    #flash-btn { background: #4caf50; color: #fff; }
-    #status { margin-top: 16px; color: #1976d2; }
-  </style>
+  <title>ESP32C3 Flasher</title>
   <script src="https://unpkg.com/espwebtool@3.7.0/dist/espwebtool.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
-  <h2>Dasai Mochi ESP32-C3 Flasher</h2>
-  <div class="flasher-actions">
-    <button id="flash-btn">Flash Firmware</button>
-    <span id="status"></span>
-  </div>
-  <div id="readme-container">
-    <h3>Hướng dẫn sử dụng</h3>
-    <div id="readme-content">Đang tải README.md...</div>
-  </div>
+  <button id="flash-btn">Flash Firmware</button>
   <script>
     document.getElementById('flash-btn').onclick = () => {
-      // Mở giao diện flash với manifest, không kiểm tra Improv Wi-Fi
       window.espWebTool.open({ manifest: 'firmware/manifest.json' });
     };
-
-    // Load README.md
-    async function loadReadme() {
-      const readmeDiv = document.getElementById('readme-content');
-      try {
-        const res = await fetch('README.md');
-        if (!res.ok) throw new Error('Không tìm thấy file README.md');
-        const md = await res.text();
-        readmeDiv.innerHTML = marked.parse(md);
-      } catch (e) {
-        readmeDiv.innerHTML = `<span style="color:red;">Lỗi: ${e.message}</span>`;
-      }
-    }
-    window.onload = loadReadme;
   </script>
 </body>
 </html>
