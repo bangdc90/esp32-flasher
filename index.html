@@ -7,7 +7,6 @@
     body { font-family: Arial, sans-serif; margin: 50px; }
     .flasher-actions { display: flex; gap: 24px; margin-bottom: 32px; }
     button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
-    #connect-btn { background: #1976d2; color: #fff; }
     #flash-btn { background: #4caf50; color: #fff; }
     #status { margin-top: 16px; color: #1976d2; }
   </style>
@@ -17,8 +16,7 @@
 <body>
   <h2>Dasai Mochi ESP32-C3 Flasher</h2>
   <div class="flasher-actions">
-    <button id="connect-btn">Connect</button>
-    <button id="flash-btn" disabled>Flash</button>
+    <button id="flash-btn">Flash Firmware</button>
     <span id="status"></span>
   </div>
   <div id="readme-container">
@@ -26,54 +24,9 @@
     <div id="readme-content">Đang tải README.md...</div>
   </div>
   <script>
-    let port = null;
-    let manifest = null;
-
-    // Load manifest.json
-    async function loadManifest() {
-      const res = await fetch('firmware/manifest.json');
-      if (!res.ok) throw new Error('Không tìm thấy manifest.json');
-      return await res.json();
-    }
-
-    // Connect button
-    document.getElementById('connect-btn').onclick = async () => {
-      document.getElementById('status').textContent = 'Đang kết nối...';
-      try {
-        port = await navigator.serial.requestPort();
-        await port.open({ baudRate: 115200 });
-        document.getElementById('status').textContent = 'Kết nối thành công!';
-        document.getElementById('flash-btn').disabled = false;
-      } catch (e) {
-        document.getElementById('status').textContent = 'Lỗi kết nối: ' + e.message;
-      }
-    };
-
-    // Flash button
-    document.getElementById('flash-btn').onclick = async () => {
-      document.getElementById('status').textContent = 'Đang nạp firmware...';
-      try {
-        if (!manifest) manifest = await loadManifest();
-        const builds = manifest.builds || [];
-        if (!builds.length) throw new Error('Manifest không hợp lệ');
-        const parts = builds[0].parts;
-        // Tải từng file firmware
-        const files = await Promise.all(parts.map(async part => {
-          const res = await fetch('firmware/' + part.path);
-          if (!res.ok) throw new Error('Không tìm thấy ' + part.path);
-          const arr = new Uint8Array(await res.arrayBuffer());
-          return { data: arr, offset: part.offset };
-        }));
-        // Flash bằng espwebtool
-        await window.espWebTool.flash({
-          port,
-          files,
-          chip: builds[0].chipFamily
-        });
-        document.getElementById('status').textContent = 'Nạp firmware thành công!';
-      } catch (e) {
-        document.getElementById('status').textContent = 'Lỗi flash: ' + e.message;
-      }
+    document.getElementById('flash-btn').onclick = () => {
+      // Mở giao diện flash với manifest, không kiểm tra Improv Wi-Fi
+      window.espWebTool.open({ manifest: 'firmware/manifest.json' });
     };
 
     // Load README.md
