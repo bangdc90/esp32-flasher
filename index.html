@@ -52,7 +52,9 @@
     <button id="connect-button" style="padding: 10px 20px; background-color: #1976d2; color: white; border: none; border-radius: 5px; cursor: pointer;">
       Connect
     </button>
-    <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
+    <button id="flash-button" style="padding: 10px 20px; background-color: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      Flash Firmware
+    </button>
   </div>
   <script src="https://esp.huhn.me/webflash.js"></script>
   <esp-web-flasher></esp-web-flasher>
@@ -90,22 +92,32 @@
     }
 
     // Hàm xử lý kết nối thiết bị
-    <script>
-      // Hàm xử lý kết nối thiết bị
-      async function connectDevice() {
-        const flasher = document.querySelector('esp-web-flasher');
-        try {
-          await flasher.connect(); // Kết nối tới thiết bị
-          alert('Kết nối thành công!');
-        } catch (error) {
-          alert(`Lỗi kết nối: ${error.message}`);
-        }
+    async function connectDevice() {
+      const flasher = document.querySelector('esp-web-flasher');
+      try {
+        await flasher.connect(); // Kết nối tới thiết bị
+        alert('Kết nối thành công!');
+      } catch (error) {
+        alert(`Lỗi kết nối: ${error.message}`);
       }
-    
-      window.onload = () => {
-        loadReadme();
-        document.getElementById('connect-button').addEventListener('click', connectDevice);
-      };
-    </script>
+    }
+
+    // Hàm flash firmware
+    async function flashFirmware() {
+      const flasher = document.querySelector('esp-web-flasher');
+      try {
+        await flasher.flash('firmware/manifest.json'); // Flash firmware từ manifest.json
+        alert('Flash firmware thành công!');
+      } catch (error) {
+        alert(`Lỗi flash firmware: ${error.message}`);
+      }
+    }
+
+    window.onload = () => {
+      loadReadme();
+      document.getElementById('connect-button').addEventListener('click', connectDevice);
+      document.getElementById('flash-button').addEventListener('click', flashFirmware);
+    };
+  </script>
 </body>
 </html>
