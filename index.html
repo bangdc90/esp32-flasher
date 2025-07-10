@@ -3,11 +3,48 @@
 <head>
   <meta charset="UTF-8">
   <title>ESP32 Online Flasher</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    .code { font-family: Consolas, monospace; background: #eee; padding: 8px; }
+    #device-list { margin-top: 20px; }
+    #device-list li { margin-bottom: 8px; }
+  </style>
 </head>
 <body>
   <h2>ESP32 Online Flasher</h2>
   <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
   <script type="module" src="https://unpkg.com/esp-web-tools@latest/dist/web/install-button.js?module"></script>
   <p>Bạn cần dùng Chrome và kết nối ESP32 qua USB.</p>
+
+  <h3>Danh sách thiết bị</h3>
+  <ul id="device-list">
+    <li>Đang tải danh sách...</li>
+  </ul>
+
+  <script>
+    // Hàm load và render danh sách thiết bị từ components.json
+    async function loadDeviceList() {
+      const ul = document.getElementById('device-list');
+      ul.innerHTML = '<li>Đang tải danh sách...</li>';
+      try {
+        const res = await fetch('components.json');
+        if (!res.ok) throw new Error('Không tìm thấy file components.json');
+        const devices = await res.json();
+        ul.innerHTML = '';
+        if (devices.length === 0) {
+          ul.innerHTML = '<li>Không có thiết bị nào.</li>';
+        } else {
+          devices.forEach(d => {
+            const li = document.createElement('li');
+            li.innerHTML = `<strong>${d.name}:</strong> <a href="${d.url}" target="_blank">${d.url}</a>`;
+            ul.appendChild(li);
+          });
+        }
+      } catch (e) {
+        ul.innerHTML = `<li style="color:red;">Lỗi: ${e.message}</li>`;
+      }
+    }
+    window.onload = loadDeviceList;
+  </script>
 </body>
 </html>
