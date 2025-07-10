@@ -8,9 +8,15 @@
 <body>
   <button id="flash-btn">Flash Firmware</button>
   <script>
-    document.getElementById('flash-btn').onclick = () => {
-      window.espWebTool.open({ manifest: 'firmware/manifest.json' });
-    };
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('flash-btn').onclick = function() {
+        if (window.espWebTool && window.espWebTool.open) {
+          window.espWebTool.open({ manifest: 'firmware/manifest.json' });
+        } else {
+          alert('espWebTool chưa sẵn sàng!');
+        }
+      };
+    });
   </script>
 </body>
 </html>
