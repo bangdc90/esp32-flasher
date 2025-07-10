@@ -3,9 +3,11 @@
   "builds": [
     {
       "chipFamily": "ESP32C3",
-      "version": "1.0.0",
-      "path": "mochi_v1.bin",
-      "address": 65536
+      "parts": [
+        { "path": "bootloader.bin", "offset": 4096 },
+        { "path": "partitions.bin", "offset": 32768 },
+        { "path": "mochi_v1.bin", "offset": 65536 }
+      ]
     }
   ]
 }
