@@ -50,12 +50,7 @@
 <body>
   <h2>Dasai Mochi ESP32-C3 Flasher</h2>
   <div class="flasher-actions">
-    <button id="connect-button" style="padding: 10px 20px; background-color: #1976d2; color: white; border: none; border-radius: 5px; cursor: pointer;">
-      Connect
-    </button>
-    <button id="flash-button" style="padding: 10px 20px; background-color: #4caf50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-      Flash Firmware
-    </button>
+    <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
   </div>
   <div style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 20px 28px; border-radius: 10px; margin-bottom: 24px;">
     <h3 style="margin-top:0; color:#1976d2; font-size: 1.2em;">Hướng dẫn sử dụng</h3>
@@ -90,34 +85,8 @@
       }
     }
 
-    // Hàm xử lý kết nối thiết bị
-    async function connectDevice() {
-      try {
-        const device = await navigator.serial.requestPort(); // Yêu cầu kết nối thiết bị qua Serial
-        await device.open({ baudRate: 115200 });
-        alert('Kết nối thành công!');
-      } catch (error) {
-        alert(`Lỗi kết nối: ${error.message}`);
-      }
-    }
-
-    // Hàm flash firmware
-    async function flashFirmware() {
-      try {
-        const manifestUrl = 'firmware/manifest.json'; // Đường dẫn tới file manifest.json
-        const esptool = new ESPLoader(await navigator.serial.requestPort());
-        await esptool.initialize();
-        await esptool.flash(manifestUrl);
-        alert('Flash firmware thành công!');
-      } catch (error) {
-        alert(`Lỗi flash firmware: ${error.message}`);
-      }
-    }
-
     window.onload = () => {
       loadReadme();
-      document.getElementById('connect-button').addEventListener('click', connectDevice);
-      document.getElementById('flash-button').addEventListener('click', flashFirmware);
     };
   </script>
 </body>
