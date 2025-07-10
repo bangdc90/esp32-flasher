@@ -1,15 +1,10 @@
 {
-  "name": "ESP32 Firmware",
+  "name": "Mochi ESP32C3 Firmware",
   "builds": [
     {
-      "chipFamily": "ESP32",
+      "chipFamily": "ESP32C3",
       "version": "1.0.0",
-      "path": "firmware_v1.0.0.bin"
-    },
-    {
-      "chipFamily": "ESP32",
-      "version": "1.1.0",
-      "path": "firmware_v1.1.0.bin"
+      "path": "mochi_v1.bin"
     }
   ]
 }
