@@ -12,34 +12,27 @@
     #status { margin-top: 16px; color: #1976d2; }
   </style>
   <script type="module">
-    let esptoolMod = null;
+    import { ESPLoader } from "https://unpkg.com/esp-web-flasher@5.1.4/dist/web/index.js?module";
+
     let port = null;
-    let chip = null;
+    let loader = null;
     let manifest = null;
 
-    // Load manifest.json
     async function loadManifest() {
       const res = await fetch('firmware/manifest.json');
       if (!res.ok) throw new Error('Không tìm thấy manifest.json');
       return await res.json();
     }
 
-    // Load esptool module
-    async function loadEsptool() {
-      if (!esptoolMod) {
-        esptoolMod = await import("https://unpkg.com/esp-web-flasher@5.1.4/dist/web/index.js?module");
-      }
-      return esptoolMod;
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('connect-btn').onclick = async () => {
         document.getElementById('status').textContent = 'Đang kết nối...';
         try {
-          const esptool = await loadEsptool();
-          port = await esptool.requestPort();
-          chip = await esptool.connect(port);
-          document.getElementById('status').textContent = 'Kết nối thành công: ' + chip.chipFamily;
+          port = await navigator.serial.requestPort();
+          loader = new ESPLoader(port, { log: (msg) => {} });
+          await loader.connect();
+          await loader.sync();
+          document.getElementById('status').textContent = 'Kết nối thành công!';
           document.getElementById('flash-btn').disabled = false;
         } catch (e) {
           document.getElementById('status').textContent = 'Lỗi kết nối: ' + e.message;
@@ -50,7 +43,6 @@
         document.getElementById('status').textContent = 'Đang nạp firmware...';
         try {
           if (!manifest) manifest = await loadManifest();
-          const esptool = await loadEsptool();
           const builds = manifest.builds || [];
           if (!builds.length) throw new Error('Manifest không hợp lệ');
           const parts = builds[0].parts;
@@ -61,9 +53,13 @@
             const arr = new Uint8Array(await res.arrayBuffer());
             return { data: arr, address: part.offset };
           }));
-          await esptool.flashFiles(port, files, (percent) => {
-            document.getElementById('status').textContent = `Đang nạp: ${Math.round(percent * 100)}%`;
-          });
+          // Flash từng phần
+          for (const file of files) {
+            await loader.flashData(file.data, file.address, (written, total) => {
+              document.getElementById('status').textContent =
+                `Đang nạp: ${Math.round((written / total) * 100)}% (0x${file.address.toString(16)})`;
+            });
+          }
           document.getElementById('status').textContent = 'Nạp firmware thành công!';
         } catch (e) {
           document.getElementById('status').textContent = 'Lỗi flash: ' + e.message;
