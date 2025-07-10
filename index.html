@@ -4,75 +4,79 @@
   <meta charset="UTF-8">
   <title>Dasai Mochi ESP32-C3 Flasher</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 50px;
-    }
-    .code {
-      font-family: Consolas, monospace;
-      background: #eee;
-      padding: 8px;
-    }
-    #device-list {
-      margin-top: 20px;
-    }
-    #device-list li {
-      margin-bottom: 8px;
-    }
-    #readme-container {
-      margin-top: 40px;
-      padding: 20px;
-      background: #f9f9f9;
-      border-radius: 8px;
-    }
-    .flasher-actions {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      margin-bottom: 32px;
-    }
-    .flasher-actions .connect-label {
-      font-size: 1.1em;
-      color: #1976d2;
-      font-weight: bold;
-    }
-    @media (max-width: 600px) {
-      .flasher-actions {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-      }
-    }
+    body { font-family: Arial, sans-serif; margin: 50px; }
+    .flasher-actions { display: flex; gap: 24px; margin-bottom: 32px; }
+    button { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    #connect-btn { background: #1976d2; color: #fff; }
+    #flash-btn { background: #4caf50; color: #fff; }
+    #status { margin-top: 16px; color: #1976d2; }
   </style>
+  <script src="https://unpkg.com/espwebtool@3.7.0/dist/espwebtool.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@esphome/esp-web-tools"></script>
 </head>
 <body>
   <h2>Dasai Mochi ESP32-C3 Flasher</h2>
   <div class="flasher-actions">
-    <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
-  </div>
-  <div style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 20px 28px; border-radius: 10px; margin-bottom: 24px;">
-    <h3 style="margin-top:0; color:#1976d2; font-size: 1.2em;">Hướng dẫn sử dụng</h3>
-    <ul style="margin:0 0 10px 0; padding-left: 22px;">
-      <li><b>Bước 1:</b> Sử dụng trình duyệt <span style="color:#1976d2;">Google Chrome</span> trên máy tính.</li>
-      <li><b>Bước 2:</b> Kết nối <b>ESP32</b> với máy tính qua cổng USB.</li>
-      <li><b>Bước 3:</b> Nếu gặp lỗi kết nối, hãy đưa ESP32 vào chế độ bootloader:
-        <ol style="margin: 8px 0 0 20px;">
-          <li>Giữ nút <b>BOOT</b> trên ESP32.</li>
-          <li>Nhấn rồi nhả nút <b>RESET</b>.</li>
-          <li>Nhả nút <b>BOOT</b>.</li>
-        </ol>
-        <span style="color:#888; font-size: 90%;">(Sau khi thực hiện, ESP32 sẽ vào chế độ boot để flash firmware)</span>
-      </li>
-    </ul>
+    <button id="connect-btn">Connect</button>
+    <button id="flash-btn" disabled>Flash</button>
+    <span id="status"></span>
   </div>
   <div id="readme-container">
     <h3>Hướng dẫn sử dụng</h3>
     <div id="readme-content">Đang tải README.md...</div>
   </div>
   <script>
-    // Hàm load và render README.md với markdown
+    let port = null;
+    let manifest = null;
+
+    // Load manifest.json
+    async function loadManifest() {
+      const res = await fetch('firmware/manifest.json');
+      if (!res.ok) throw new Error('Không tìm thấy manifest.json');
+      return await res.json();
+    }
+
+    // Connect button
+    document.getElementById('connect-btn').onclick = async () => {
+      document.getElementById('status').textContent = 'Đang kết nối...';
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 115200 });
+        document.getElementById('status').textContent = 'Kết nối thành công!';
+        document.getElementById('flash-btn').disabled = false;
+      } catch (e) {
+        document.getElementById('status').textContent = 'Lỗi kết nối: ' + e.message;
+      }
+    };
+
+    // Flash button
+    document.getElementById('flash-btn').onclick = async () => {
+      document.getElementById('status').textContent = 'Đang nạp firmware...';
+      try {
+        if (!manifest) manifest = await loadManifest();
+        const builds = manifest.builds || [];
+        if (!builds.length) throw new Error('Manifest không hợp lệ');
+        const parts = builds[0].parts;
+        // Tải từng file firmware
+        const files = await Promise.all(parts.map(async part => {
+          const res = await fetch('firmware/' + part.path);
+          if (!res.ok) throw new Error('Không tìm thấy ' + part.path);
+          const arr = new Uint8Array(await res.arrayBuffer());
+          return { data: arr, offset: part.offset };
+        }));
+        // Flash bằng espwebtool
+        await window.espWebTool.flash({
+          port,
+          files,
+          chip: builds[0].chipFamily
+        });
+        document.getElementById('status').textContent = 'Nạp firmware thành công!';
+      } catch (e) {
+        document.getElementById('status').textContent = 'Lỗi flash: ' + e.message;
+      }
+    };
+
+    // Load README.md
     async function loadReadme() {
       const readmeDiv = document.getElementById('readme-content');
       try {
@@ -84,10 +88,7 @@
         readmeDiv.innerHTML = `<span style="color:red;">Lỗi: ${e.message}</span>`;
       }
     }
-
-    window.onload = () => {
-      loadReadme();
-    };
+    window.onload = loadReadme;
   </script>
 </body>
 </html>
