@@ -90,20 +90,22 @@
     }
 
     // Hàm xử lý kết nối thiết bị
-    async function connectDevice() {
-      const flasher = document.querySelector('esp-web-flasher');
-      try {
-        await flasher.requestDevice(); // Yêu cầu kết nối tới thiết bị
-        alert('Kết nối thành công!');
-      } catch (error) {
-        alert(`Lỗi kết nối: ${error.message}`);
+    <script>
+      // Hàm xử lý kết nối thiết bị
+      async function connectDevice() {
+        const flasher = document.querySelector('esp-web-flasher');
+        try {
+          await flasher.connect(); // Kết nối tới thiết bị
+          alert('Kết nối thành công!');
+        } catch (error) {
+          alert(`Lỗi kết nối: ${error.message}`);
+        }
       }
-    }
-
-    window.onload = () => {
-      loadReadme();
-      document.getElementById('connect-button').addEventListener('click', connectDevice);
-    };
-  </script>
+    
+      window.onload = () => {
+        loadReadme();
+        document.getElementById('connect-button').addEventListener('click', connectDevice);
+      };
+    </script>
 </body>
 </html>
