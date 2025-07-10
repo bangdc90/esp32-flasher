@@ -2,12 +2,13 @@
   "name": "Mochi ESP32C3 Firmware",
   "builds": [
     {
-      "chipFamily": "ESP32C3",
+      "chipFamily": "ESP32-C3",
       "parts": [
-        { "path": "bootloader.bin", "offset": 4096 },
+        { "path": "bootloader.bin", "offset": 0 },
         { "path": "partitions.bin", "offset": 32768 },
         { "path": "mochi_v1.bin", "offset": 65536 }
       ]
     }
   ]
 }
+
