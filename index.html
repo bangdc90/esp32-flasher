@@ -30,8 +30,7 @@
         try {
           port = await navigator.serial.requestPort();
           loader = new ESPLoader(port, { log: (msg) => {} });
-          await loader.connect();
-          await loader.sync();
+          await loader.main(); // Thay vì connect()
           document.getElementById('status').textContent = 'Kết nối thành công!';
           document.getElementById('flash-btn').disabled = false;
         } catch (e) {
