@@ -8,7 +8,10 @@
     .code { font-family: Consolas, monospace; background: #eee; padding: 8px; }
     #device-list { margin-top: 20px; }
     #device-list li { margin-bottom: 8px; }
+    #readme-container { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
   </style>
+  <!-- Thêm thư viện marked.js để render markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
   <h2>Dasai Mochi ESP32-C3 Flasher</h2>
@@ -20,6 +23,11 @@
   <ul id="device-list">
     <li>Đang tải danh sách...</li>
   </ul>
+
+  <div id="readme-container">
+    <h3>Hướng dẫn sử dụng</h3>
+    <div id="readme-content">Đang tải README.md...</div>
+  </div>
 
   <script>
     // Hàm load và render danh sách thiết bị từ components.json
@@ -44,7 +52,24 @@
         ul.innerHTML = `<li style="color:red;">Lỗi: ${e.message}</li>`;
       }
     }
-    window.onload = loadDeviceList;
+
+    // Hàm load và render README.md với markdown
+    async function loadReadme() {
+      const readmeDiv = document.getElementById('readme-content');
+      try {
+        const res = await fetch('README.md');
+        if (!res.ok) throw new Error('Không tìm thấy file README.md');
+        const md = await res.text();
+        readmeDiv.innerHTML = marked.parse(md);
+      } catch (e) {
+        readmeDiv.innerHTML = `<span style="color:red;">Lỗi: ${e.message}</span>`;
+      }
+    }
+
+    window.onload = () => {
+      loadDeviceList();
+      loadReadme();
+    };
   </script>
 </body>
 </html>
