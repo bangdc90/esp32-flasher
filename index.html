@@ -9,27 +9,45 @@
     #device-list { margin-top: 20px; }
     #device-list li { margin-bottom: 8px; }
     #readme-container { margin-top: 40px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
+    .flasher-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .flasher-actions .connect-label {
+      font-size: 1.1em;
+      color: #1976d2;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .flasher-actions { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
   </style>
-  <!-- Thêm thư viện marked.js để render markdown -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
 <body>
   <h2>Dasai Mochi ESP32-C3 Flasher</h2>
-  <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
+  <div class="flasher-actions">
+    <span class="connect-label">1. Kết nối ESP32 với máy tính và nhấn nút bên dưới:</span>
+    <esp-web-install-button manifest="firmware/manifest.json"></esp-web-install-button>
+  </div>
   <script type="module" src="https://unpkg.com/esp-web-tools@latest/dist/web/install-button.js?module"></script>
+
   <div style="background: #fff; border: 1px solid #e0e0e0; box-shadow: 0 2px 8px rgba(0,0,0,0.04); padding: 20px 28px; border-radius: 10px; margin-bottom: 24px;">
-  <h3 style="margin-top:0; color:#1976d2; font-size: 1.2em;">Hướng dẫn sử dụng</h3>
-  <ul style="margin:0 0 10px 0; padding-left: 22px;">
-    <li><b>Bước 1:</b> Sử dụng trình duyệt <span style="color:#1976d2;">Google Chrome</span> trên máy tính.</li>
-    <li><b>Bước 2:</b> Kết nối <b>ESP32</b> với máy tính qua cổng USB.</li>
-    <li><b>Bước 3:</b> Nếu gặp lỗi kết nối, hãy đưa ESP32 vào chế độ bootloader:
-      <ol style="margin: 8px 0 0 20px;">
-        <li>Giữ nút <b>BOOT</b> trên ESP32.</li>
-        <li>Nhấn rồi nhả nút <b>RESET</b>.</li>
-        <li>Nhả nút <b>BOOT</b>.</li>
-      </ol>
-      <span style="color:#888; font-size: 90%;">(Sau khi thực hiện, ESP32 sẽ vào chế độ boot để flash firmware)</span>
-    </li>
-  </ul>
+    <h3 style="margin-top:0; color:#1976d2; font-size: 1.2em;">Hướng dẫn sử dụng</h3>
+    <ul style="margin:0 0 10px 0; padding-left: 22px;">
+      <li><b>Bước 1:</b> Sử dụng trình duyệt <span style="color:#1976d2;">Google Chrome</span> trên máy tính.</li>
+      <li><b>Bước 2:</b> Kết nối <b>ESP32</b> với máy tính qua cổng USB.</li>
+      <li><b>Bước 3:</b> Nếu gặp lỗi kết nối, hãy đưa ESP32 vào chế độ bootloader:
+        <ol style="margin: 8px 0 0 20px;">
+          <li>Giữ nút <b>BOOT</b> trên ESP32.</li>
+          <li>Nhấn rồi nhả nút <b>RESET</b>.</li>
+          <li>Nhả nút <b>BOOT</b>.</li>
+        </ol>
+        <span style="color:#888; font-size: 90%;">(Sau khi thực hiện, ESP32 sẽ vào chế độ boot để flash firmware)</span>
+      </li>
+    </ul>
   </div>
   <div id="readme-container">
     <h3>Hướng dẫn sử dụng</h3>
